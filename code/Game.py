@@ -15,7 +15,7 @@ class Game:
         while True:
             menu = Menu(self.window)
             menu.run()
-
+            pass
 
 
 
