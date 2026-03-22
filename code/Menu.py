@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import pygame
 
-from code.Const import COLOR_ORANGE, COLOR_BLUE, MENU_OPTION, WIN_WIDTH, C_WHITE
+from code.Const import COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, MENU_OPTION, WIN_WIDTH, C_WHITE
 
 # Classe Menu, responsável por exibir o menu do jogo
 class Menu:
@@ -10,6 +10,7 @@ class Menu:
         self.window = window # Recebe a janela do jogo para desenhar o menu
         self.surf = pygame.image.load('./asset/MenuBg.png').convert_alpha() # Carrega a imagem de fundo do menu
         self.rect = self.surf.get_rect(left=0, top=0) # Define a posição do menu (canto superior esquerdo)
+        self.selected = 0
 # Método run, responsável por desenhar o menu na janela
     def run(self):
         pygame.mixer.music.load('./asset/Menu.mp3') # Carrega a música de fundo
@@ -22,15 +23,25 @@ class Menu:
             self.window.blit(subtitle_surf, subtitle_rect) # Desenha o subtítulo na janela
             
             for i in range(len(MENU_OPTION)):
-                title_surf, title_rect = self.menu_text(text_size=20, text=MENU_OPTION[i], color=C_WHITE, text_center=((WIN_WIDTH / 2), 200 + i * 25)) # Cria superfície do título
-                self.window.blit(title_surf, title_rect) # Desenha o título na janela
-            pygame.display.flip() # Atualiza a tela para mostrar o menu desenhado
+                color = COLOR_YELLOW if i == self.selected else C_WHITE
+                opt_surf, opt_rect = self.menu_text(text_size=20, text=MENU_OPTION[i], color=color, text_center=((WIN_WIDTH / 2), 200 + i * 25))
+                self.window.blit(opt_surf, opt_rect)
 
             # Check for events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: # Se o evento for fechar a janela
                     pygame.quit() # Encerra o Pygame
                     quit() # Encerra o programa
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.selected = (self.selected - 1) % len(MENU_OPTION)
+                    elif event.key == pygame.K_DOWN:
+                        self.selected = (self.selected + 1) % len(MENU_OPTION)
+                    elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                        return self.selected
+
+            pygame.display.flip() # Atualiza a tela para mostrar o menu desenhado
+
     # Método menu_text, responsável por criar uma superfície de texto para ser desenhada no menu
     def menu_text(self, text_size: int, text: str, color: tuple, text_center: tuple):
         text_font = pygame.font.SysFont(name='Arial', size=text_size) # Cria uma fonte do sistema com o nome e tamanho especificados
